@@ -7,6 +7,8 @@ export const storesRouter = Router();
 const createStoreSchema = zod.object({ name: zod.string().min(1, "Name is required") });
 const updateStoreSchema = createStoreSchema.partial();
 
+const LOW_STOCK_THRESHOLD = 5;
+
 storesRouter.get("/", async (_req, res) => {
   try {
     const stores = await prisma.store.findMany({ orderBy: { name: "asc" } });
@@ -14,6 +16,35 @@ storesRouter.get("/", async (_req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Failed to list stores" });
+  }
+});
+
+/** Non-trivial: inventory summary by store (aggregation in DB). */
+storesRouter.get("/summaries", async (_req, res) => {
+  try {
+    const rows = await prisma.$queryRaw<
+      { storeId: string; storeName: string; productCount: bigint; totalValue: number; lowStockCount: bigint }[]
+    >`
+      SELECT s.id AS storeId, s.name AS storeName,
+        COUNT(p.id) AS productCount,
+        COALESCE(SUM(p.price * p.quantityInStock), 0) AS totalValue,
+        SUM(CASE WHEN p.quantityInStock < ${LOW_STOCK_THRESHOLD} THEN 1 ELSE 0 END) AS lowStockCount
+      FROM Store s
+      LEFT JOIN Product p ON p.storeId = s.id
+      GROUP BY s.id, s.name
+      ORDER BY s.name
+    `;
+    const summaries = rows.map((r) => ({
+      storeId: r.storeId,
+      storeName: r.storeName,
+      productCount: Number(r.productCount),
+      totalInventoryValue: Math.round(r.totalValue * 100) / 100,
+      lowStockCount: Number(r.lowStockCount),
+    }));
+    res.json(summaries);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to get store summaries" });
   }
 });
 
