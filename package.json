@@ -3,10 +3,6 @@
   "private": true,
   "description": "Small inventory system: stores and products. Monorepo (server + web).",
   "packageManager": "pnpm@9.15.0",
-  "workspaces": [
-    "server",
-    "web"
-  ],
   "scripts": {
     "dev:server": "pnpm --filter server dev",
     "dev:web": "pnpm --filter web dev",
