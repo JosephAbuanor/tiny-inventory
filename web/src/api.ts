@@ -2,10 +2,17 @@ import type { Product, ProductListResponse, Store, StoreSummary } from "./types"
 
 const API = "/api";
 
+interface ErrorBody {
+  error?: { message?: string; details?: unknown } | string;
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error((body as { error?: string }).error ?? res.statusText);
+    const body = (await res.json().catch(() => ({}))) as ErrorBody;
+    const err = body.error;
+    const message =
+      typeof err === "object" && err?.message ? err.message : typeof err === "string" ? err : res.statusText;
+    throw new Error(message);
   }
   if (res.status === 204) return undefined as T;
   return res.json();

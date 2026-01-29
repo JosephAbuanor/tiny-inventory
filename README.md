@@ -30,7 +30,7 @@ Then open **http://localhost:4000**. The app serves the API and the frontend. Se
 - `GET /api/products/categories?storeId=` — distinct categories (for UI filter)
 - `GET/POST /api/products` and `GET/PUT/DELETE /api/products/:id` — CRUD
 
-List products returns `{ data, total, page, limit }`. Errors use `{ error: string }` with 4xx/5xx.
+List products returns `{ data, total, page, limit }`. Errors use `{ error: { message: string, details?: unknown } }` with 4xx/5xx (e.g. validation: `message: "Validation failed"`, `details`: field errors).
 
 ## Decisions & Trade-offs
 

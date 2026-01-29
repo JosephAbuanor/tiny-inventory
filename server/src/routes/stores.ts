@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z as zod } from "zod";
 import { prisma } from "../lib/db.js";
+import { sendError } from "../lib/errors.js";
 
 export const storesRouter = Router();
 
@@ -15,7 +16,7 @@ storesRouter.get("/", async (_req, res) => {
     res.json(stores);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to list stores" });
+    sendError(res, 500, "Failed to list stores");
   }
 });
 
@@ -44,7 +45,7 @@ storesRouter.get("/summaries", async (_req, res) => {
     res.json(summaries);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to get store summaries" });
+    sendError(res, 500, "Failed to get store summaries");
   }
 });
 
@@ -54,32 +55,32 @@ storesRouter.get("/:id", async (req, res) => {
       where: { id: req.params.id },
       include: { products: true },
     });
-    if (!store) return res.status(404).json({ error: "Store not found" });
+    if (!store) return sendError(res, 404, "Store not found");
     res.json(store);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to get store" });
+    sendError(res, 500, "Failed to get store");
   }
 });
 
 storesRouter.post("/", async (req, res) => {
   const parsed = createStoreSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    return sendError(res, 400, "Validation failed", parsed.error.flatten().fieldErrors);
   }
   try {
     const store = await prisma.store.create({ data: parsed.data });
     res.status(201).json(store);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to create store" });
+    sendError(res, 500, "Failed to create store");
   }
 });
 
 storesRouter.put("/:id", async (req, res) => {
   const parsed = updateStoreSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    return sendError(res, 400, "Validation failed", parsed.error.flatten().fieldErrors);
   }
   try {
     const store = await prisma.store.update({
@@ -89,10 +90,10 @@ storesRouter.put("/:id", async (req, res) => {
     res.json(store);
   } catch (e: unknown) {
     if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return res.status(404).json({ error: "Store not found" });
+      return sendError(res, 404, "Store not found");
     }
     console.error(e);
-    res.status(500).json({ error: "Failed to update store" });
+    sendError(res, 500, "Failed to update store");
   }
 });
 
@@ -102,9 +103,9 @@ storesRouter.delete("/:id", async (req, res) => {
     res.status(204).send();
   } catch (e: unknown) {
     if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return res.status(404).json({ error: "Store not found" });
+      return sendError(res, 404, "Store not found");
     }
     console.error(e);
-    res.status(500).json({ error: "Failed to delete store" });
+    sendError(res, 500, "Failed to delete store");
   }
 });

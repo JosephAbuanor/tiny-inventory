@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z as zod } from "zod";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/db.js";
+import { sendError } from "../lib/errors.js";
 
 export const productsRouter = Router();
 
@@ -34,7 +35,7 @@ productsRouter.get("/categories", async (req, res) => {
     res.json(categories);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to list categories" });
+    sendError(res, 500, "Failed to list categories");
   }
 });
 
@@ -74,7 +75,7 @@ productsRouter.get("/", async (req, res) => {
     res.json({ data, total, page, limit });
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to list products" });
+    sendError(res, 500, "Failed to list products");
   }
 });
 
@@ -84,18 +85,18 @@ productsRouter.get("/:id", async (req, res) => {
       where: { id: req.params.id },
       include: { store: true },
     });
-    if (!product) return res.status(404).json({ error: "Product not found" });
+    if (!product) return sendError(res, 404, "Product not found");
     res.json(product);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to get product" });
+    sendError(res, 500, "Failed to get product");
   }
 });
 
 productsRouter.post("/", async (req, res) => {
   const parsed = createProductSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    return sendError(res, 400, "Validation failed", parsed.error.flatten().fieldErrors);
   }
   try {
     const data = {
@@ -109,14 +110,14 @@ productsRouter.post("/", async (req, res) => {
     res.status(201).json(product);
   } catch (e) {
     console.error(e);
-    res.status(500).json({ error: "Failed to create product" });
+    sendError(res, 500, "Failed to create product");
   }
 });
 
 productsRouter.put("/:id", async (req, res) => {
   const parsed = updateProductSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    return sendError(res, 400, "Validation failed", parsed.error.flatten().fieldErrors);
   }
   try {
     const data =
@@ -131,10 +132,10 @@ productsRouter.put("/:id", async (req, res) => {
     res.json(product);
   } catch (e: unknown) {
     if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return res.status(404).json({ error: "Product not found" });
+      return sendError(res, 404, "Product not found");
     }
     console.error(e);
-    res.status(500).json({ error: "Failed to update product" });
+    sendError(res, 500, "Failed to update product");
   }
 });
 
@@ -144,9 +145,9 @@ productsRouter.delete("/:id", async (req, res) => {
     res.status(204).send();
   } catch (e: unknown) {
     if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return res.status(404).json({ error: "Product not found" });
+      return sendError(res, 404, "Product not found");
     }
     console.error(e);
-    res.status(500).json({ error: "Failed to delete product" });
+    sendError(res, 500, "Failed to delete product");
   }
 });
