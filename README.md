@@ -16,7 +16,7 @@ Then open **http://localhost:4000**. The app serves the API and the frontend. Se
 
 **Local dev (no Docker):**
 
-1. From repo root: `pnpm install` (or `npm install`).
+1. From repo root: `pnpm install`.
 2. In `server/`: copy `.env.example` to `.env`, then `pnpm db:migrate` and `pnpm db:seed`.
 3. Terminal 1: `pnpm dev:server` (API on http://localhost:4000).
 4. Terminal 2: `pnpm dev:web` (Vite on http://localhost:3000, proxies `/api` to the server).
@@ -34,13 +34,13 @@ List products returns `{ data, total, page, limit }`. Errors use `{ error: { mes
 
 ## Decisions & Trade-offs
 
-- **Monorepo (server + web):** Clear boundary; shared tooling and one clone. Chose npm/pnpm workspaces.
-- **Prisma + SQLite:** Real relations and migrations without an external DB; good for assignment and Docker. Postgres would be used for production scale.
-- **Single Docker container:** Server serves the built React app and the API so `docker compose up` is one service, one port. Trade-off: no separate scaling of front/back; acceptable for this scope.
+- **Monorepo (server + web):** Clear boundary; shared tooling and one clone. Chose pnpm workspaces.
+- **Prisma + SQLite:** Real relations and migrations without an external DB. Postgres could be used for production scale.
+- **Single Docker container:** Server serves the built React app and the API so `docker compose up` is one service, one port. Trade-off: no separate scaling of front/back- acceptable for this scope.
 - **No auth:** Per assignment; would add API keys or JWT and rate limiting for production.
 - **Zod on server:** Request validation and clear error shapes without a heavy framework.
 - **Frontend:** Minimal routing (state-based), no global state library; validation mirrors server. Focus on list/detail flow and loading/error/empty states.
-- **Categories as string:** I intentionally modeled categories as a simple string field rather than a separate table to keep the domain lightweight and avoid premature complexity. To support the UI, I exposed a derived endpoint that returns distinct category values from existing products. In a larger system with category ownership, permissions, or metadata, this would naturally evolve into a first-class Category model.
+- **Categories as string:** I intentionally modeled categories as a simple string field rather than a separate table to keep the domain lightweight and avoid premature complexity. To support the UI, I exposed a derived endpoint that returns distinct category values from existing products. In a larger system with category ownership, permissions, or metadata, this would naturally evolve into a first-class Category model. Categories are also normalized (trimmed and lowercased) on write to avoid duplication.
 
 ## Testing Approach
 

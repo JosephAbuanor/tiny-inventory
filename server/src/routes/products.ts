@@ -1,8 +1,20 @@
 import { Router } from "express";
 import { z as zod } from "zod";
-import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/db.js";
 import { sendError } from "../lib/errors.js";
+
+/**
+ * Narrow query shape for product list filtering.
+ * Intentionally avoids Prisma-generated types to keep
+ * HTTP layer decoupled from the ORM.
+ */
+
+type ProductWhereInput = {
+  storeId?: string;
+  category?: { equals: string };
+  price?: { gte?: number; lte?: number };
+  quantityInStock?: { lt: number };
+};
 
 export const productsRouter = Router();
 
@@ -24,14 +36,14 @@ function normalizeCategory(value: string): string {
 productsRouter.get("/categories", async (req, res) => {
   try {
     const storeId = req.query.storeId as string | undefined;
-    const where: Prisma.ProductWhereInput = storeId ? { storeId } : {};
+    const where: ProductWhereInput = storeId ? { storeId } : {};
     const rows = await prisma.product.findMany({
       where,
       select: { category: true },
       distinct: ["category"],
       orderBy: { category: "asc" },
     });
-    const categories = rows.map((r) => r.category);
+    const categories = rows.map((r: { category: string }) => r.category);
     res.json(categories);
   } catch (e) {
     console.error(e);
@@ -51,13 +63,13 @@ productsRouter.get("/", async (req, res) => {
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10));
     const skip = (page - 1) * limit;
 
-    const where: Prisma.ProductWhereInput = {};
+    const where: ProductWhereInput = {};
     if (storeId) where.storeId = storeId;
     if (category) where.category = { equals: category };
     if (minPrice != null && !Number.isNaN(minPrice) || maxPrice != null && !Number.isNaN(maxPrice)) {
       where.price = {};
-      if (minPrice != null && !Number.isNaN(minPrice)) (where.price as { gte?: number }).gte = minPrice;
-      if (maxPrice != null && !Number.isNaN(maxPrice)) (where.price as { lte?: number }).lte = maxPrice;
+      if (minPrice != null && !Number.isNaN(minPrice)) where.price.gte = minPrice;
+      if (maxPrice != null && !Number.isNaN(maxPrice)) where.price.lte = maxPrice;
     }
     if (lowStock) where.quantityInStock = { lt: LOW_STOCK_THRESHOLD };
 

@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+/// <reference path="../node_modules/.prisma/client/index.d.ts" />
+import { PrismaClient } from "../node_modules/.prisma/client/index.js";
 
 const prisma = new PrismaClient();
 

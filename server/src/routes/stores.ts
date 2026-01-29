@@ -35,7 +35,7 @@ storesRouter.get("/summaries", async (_req, res) => {
       GROUP BY s.id, s.name
       ORDER BY s.name
     `;
-    const summaries = rows.map((r) => ({
+    const summaries = rows.map((r: { storeId: string; storeName: string; productCount: bigint; totalValue: number; lowStockCount: bigint }) => ({
       storeId: r.storeId,
       storeName: r.storeName,
       productCount: Number(r.productCount),
