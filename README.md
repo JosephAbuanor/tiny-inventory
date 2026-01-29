@@ -12,20 +12,20 @@ cd tiny-inventory
 docker compose up --build
 ```
 
-Then open **http://localhost:4000**. The app serves the API and the frontend. Seed data (3 stores, 15 products) is applied on first start.
+Then open **http://localhost:4000**. The app serves the API and the frontend. Seed data (3 stores, 102 products) is applied on first start.
 
 **Local dev (no Docker):**
 
 1. From repo root: `pnpm install`.
-2. In `server/`: copy `.env.example` to `.env`, then `pnpm db:migrate` and `pnpm db:seed`.
+2. In `server/`: copy `.env.example` to `.env`, then `pnpm db:migrate`, `pnpm db:generate` and `pnpm db:seed`.
 3. Terminal 1: `pnpm dev:server` (API on http://localhost:4000).
 4. Terminal 2: `pnpm dev:web` (Vite on http://localhost:3000, proxies `/api` to the server).
 
 ## API sketch
 
 - `GET/POST /api/stores` — list, create
-- `GET/PUT/DELETE /api/stores/:id` — get, update, delete
 - `GET /api/stores/summaries` — **non-trivial**: per-store product count, total inventory value, low-stock count
+- `DELETE /api/stores/:id` — delete store (and all its products)
 - `GET /api/products?storeId=&category=&minPrice=&maxPrice=&lowStock=&page=&limit=` — list with filter and pagination
 - `GET /api/products/categories?storeId=` — distinct categories (for UI filter)
 - `GET/POST /api/products` and `GET/PUT/DELETE /api/products/:id` — CRUD

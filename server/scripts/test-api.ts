@@ -77,25 +77,6 @@ async function main() {
   });
   summariesOk ? passed++ : failed++;
 
-  // --- Store by id (existing) ---
-  if (storeId) {
-    const getStoreOk = await test(`GET /api/stores/:id → 200 (id=${storeId.slice(0, 8)}…)`, async () => {
-      const { status, data } = await request("GET", `/api/stores/${storeId}`);
-      if (status !== 200) throw new Error(`status ${status}`);
-      const s = data as { id?: string; name?: string; products?: unknown[] };
-      if (s.id !== storeId) throw new Error("wrong store");
-      if (!Array.isArray(s.products)) throw new Error("missing products");
-    });
-    getStoreOk ? passed++ : failed++;
-  }
-
-  // --- Store 404 ---
-  const store404Ok = await test("GET /api/stores/:badId → 404", async () => {
-    const { status } = await request("GET", "/api/stores/nonexistent-id-12345");
-    if (status !== 404) throw new Error(`status ${status}, expected 404`);
-  });
-  store404Ok ? passed++ : failed++;
-
   // --- Create store ---
   let createdStoreId: string | null = null;
   const createStoreOk = await test("POST /api/stores → 201", async () => {
@@ -106,19 +87,6 @@ async function main() {
     createdStoreId = s.id;
   });
   createStoreOk ? passed++ : failed++;
-
-  // --- Update store ---
-  if (createdStoreId) {
-    const updateStoreOk = await test("PUT /api/stores/:id → 200", async () => {
-      const { status, data } = await request("PUT", `/api/stores/${createdStoreId}`, {
-        name: "API Test Store Updated",
-      });
-      if (status !== 200) throw new Error(`status ${status}`);
-      const s = data as { name: string };
-      if (s.name !== "API Test Store Updated") throw new Error("name not updated");
-    });
-    updateStoreOk ? passed++ : failed++;
-  }
 
   // --- Products list ---
   const productsListOk = await test("GET /api/products → 200, { data, total, page, limit }", async () => {

@@ -128,6 +128,8 @@ export default function ProductList({
               Next
             </button>
           </div>
+          <button className="back-button" type="button" onClick={onBack}>← Back to stores</button>
+
         </>
       )}
     </div>

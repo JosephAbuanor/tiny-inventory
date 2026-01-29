@@ -18,6 +18,7 @@ async function main() {
   });
 
   const stores = [store1, store2, store3];
+  const productCounts = [5, 12, 85];
   const categories = ["electronics", "produce", "dairy", "beverages", "snacks"];
   const names = [
     "Organic Milk",
@@ -37,8 +38,10 @@ async function main() {
   ];
 
   let i = 0;
-  for (const store of stores) {
-    for (let j = 0; j < 5; j++) {
+  for (let s = 0; s < stores.length; s++) {
+    const store = stores[s];
+    const count = productCounts[s];
+    for (let j = 0; j < count; j++) {
       const name = names[i % names.length];
       const category = categories[j % categories.length];
       await prisma.product.create({
@@ -54,7 +57,7 @@ async function main() {
     }
   }
 
-  console.log("Seed complete: 3 stores, 15 products.");
+  console.log("Seed complete");
 }
 
 main()

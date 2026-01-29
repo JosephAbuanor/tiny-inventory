@@ -28,6 +28,24 @@ export async function fetchStoreSummaries(): Promise<StoreSummary[]> {
   return handleResponse<StoreSummary[]>(res);
 }
 
+export interface CreateStoreBody {
+  name: string;
+}
+
+export async function createStore(body: CreateStoreBody): Promise<Store> {
+  const res = await fetch(`${API}/stores`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return handleResponse<Store>(res);
+}
+
+export async function deleteStore(id: string): Promise<void> {
+  const res = await fetch(`${API}/stores/${id}`, { method: "DELETE" });
+  return handleResponse<void>(res);
+}
+
 export interface ProductListParams {
   storeId?: string;
   category?: string;

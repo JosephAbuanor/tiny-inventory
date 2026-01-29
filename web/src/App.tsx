@@ -1,5 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { deleteProduct, fetchCategories, fetchProducts, fetchStores, fetchStoreSummaries } from "./api";
+import {
+  createStore,
+  deleteProduct,
+  deleteStore,
+  fetchCategories,
+  fetchProducts,
+  fetchStores,
+  fetchStoreSummaries,
+} from "./api";
 import type { Product, Store, StoreSummary } from "./types";
 import ProductForm from "./ProductForm";
 import ProductList from "./ProductList";
@@ -30,6 +38,9 @@ export default function App() {
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
+
+  const [newStoreName, setNewStoreName] = useState("");
+  const [storeFormError, setStoreFormError] = useState<string | null>(null);
 
   const loadStores = useCallback(async () => {
     setStoresLoading(true);
@@ -143,6 +154,43 @@ export default function App() {
     }
   };
 
+  const handleCreateStore = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newStoreName.trim();
+    if (!name) {
+      setStoreFormError("Name is required");
+      return;
+    }
+    setStoreFormError(null);
+    try {
+      await createStore({ name });
+      setNewStoreName("");
+      loadStores();
+      if (view === "stores") loadSummaries();
+    } catch (e) {
+      setStoreFormError(e instanceof Error ? e.message : "Failed to create store");
+    }
+  };
+
+  const handleDeleteStore = async (storeId: string, storeName: string) => {
+    const confirmed = window.confirm(
+      `Delete store "${storeName}"? This will permanently delete the store and all products in it.`
+    );
+    if (!confirmed) return;
+    try {
+      await deleteStore(storeId);
+      if (selectedStoreId === storeId) {
+        setView("stores");
+        setSelectedStoreId(null);
+        setSelectedProductId(null);
+      }
+      loadStores();
+      loadSummaries();
+    } catch (e) {
+      setStoresError(e instanceof Error ? e.message : "Failed to delete store");
+    }
+  };
+
   const selectedStoreName = selectedStoreId
     ? stores.find((s) => s.id === selectedStoreId)?.name ?? "Store"
     : "";
@@ -159,11 +207,39 @@ export default function App() {
             loading={summariesLoading}
             error={summariesError}
           />
+          <section className="store-create" aria-label="Add store">
+            <form onSubmit={handleCreateStore}>
+              <label htmlFor="new-store-name">New store name</label>
+              <input
+                id="new-store-name"
+                type="text"
+                value={newStoreName}
+                onChange={(e) => {
+                  setNewStoreName(e.target.value);
+                  setStoreFormError(null);
+                }}
+                placeholder="Store name"
+                minLength={1}
+                required
+                aria-invalid={!!storeFormError}
+                aria-describedby={storeFormError ? "store-form-error" : undefined}
+              />
+              <button type="submit" disabled={!newStoreName.trim()}>
+                Add store
+              </button>
+            </form>
+            {storeFormError && (
+              <p id="store-form-error" className="error" role="alert">
+                {storeFormError}
+              </p>
+            )}
+          </section>
           <StoreList
             stores={stores}
             loading={storesLoading}
             error={storesError}
             onSelectStore={handleSelectStore}
+            onDeleteStore={handleDeleteStore}
           />
         </>
       )}

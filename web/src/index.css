@@ -35,6 +35,28 @@ h1 {
   color: #666;
 }
 
+.store-create {
+  margin: 1rem 0;
+}
+.store-create form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.store-create label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.store-create input {
+  padding: 0.5rem;
+  min-width: 200px;
+}
+.store-create .error {
+  margin-top: 0.5rem;
+}
+
 .store-list {
   list-style: none;
   padding: 0;
@@ -43,18 +65,35 @@ h1 {
 .store-list li {
   margin: 0.25rem 0;
 }
-.store-list button {
+.store-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.store-list-item > button:first-child {
+  flex: 1;
   padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%;
   text-align: left;
 }
-.store-list button:hover {
+.store-list-item > button:first-child:hover {
   background: #f0f0f0;
+}
+.store-list-item .store-delete {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: #c00;
+  border: 1px solid #c00;
+  border-radius: 4px;
+  background: #fff;
+}
+.store-list-item .store-delete:hover {
+  background: #fee;
 }
 
 .store-summaries {
@@ -175,4 +214,8 @@ h1 {
 .product-form .form-actions button {
   padding: 0.5rem 1rem;
   cursor: pointer;
+}
+
+button.back-button {
+  padding: 1rem 1rem;
 }
