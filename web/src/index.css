@@ -20,3 +20,125 @@ h1 {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
 }
+
+.loading,
+.error,
+.empty {
+  margin: 1rem 0;
+  padding: 0.5rem;
+}
+.error {
+  color: #c00;
+  background: #fee;
+}
+.empty {
+  color: #666;
+}
+
+.store-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+.store-list li {
+  margin: 0.25rem 0;
+}
+.store-list button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  text-align: left;
+}
+.store-list button:hover {
+  background: #f0f0f0;
+}
+
+.product-list .toolbar {
+  margin: 1rem 0;
+}
+.product-list .toolbar h2 {
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+}
+.product-list .filters {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+.product-list .filters input[type="text"] {
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.25rem;
+}
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin: 1rem 0;
+}
+.product-table th,
+.product-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.product-table th {
+  font-weight: 600;
+}
+.product-table button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.product-form {
+  margin: 1rem 0;
+  max-width: 400px;
+}
+.product-form h2 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+.product-form .form-row {
+  margin-bottom: 1rem;
+}
+.product-form label {
+  display: block;
+}
+.product-form label input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+}
+.product-form .required {
+  color: #c00;
+}
+.product-form .field-error {
+  display: block;
+  color: #c00;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+.product-form .form-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+.product-form .form-actions button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
