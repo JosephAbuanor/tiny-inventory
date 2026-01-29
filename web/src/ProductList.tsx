@@ -16,6 +16,7 @@ interface Props {
   onPageChange: (page: number) => void;
   onBack: () => void;
   onSelectProduct: (id: string) => void;
+  onDeleteProduct: (id: string) => void;
   onAddProduct: () => void;
 }
 
@@ -35,6 +36,7 @@ export default function ProductList({
   onPageChange,
   onBack,
   onSelectProduct,
+  onDeleteProduct,
   onAddProduct,
 }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -83,7 +85,7 @@ export default function ProductList({
                 <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
-                <th></th>
+                <th className="actions">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -93,8 +95,17 @@ export default function ProductList({
                   <td>{p.category}</td>
                   <td>${p.price.toFixed(2)}</td>
                   <td>{p.quantityInStock}</td>
-                  <td>
+                  <td className="actions">
                     <button type="button" onClick={() => onSelectProduct(p.id)}>Edit</button>
+                    <button
+                      type="button"
+                      className="delete"
+                      onClick={() => {
+                        if (window.confirm(`Delete "${p.name}"?`)) onDeleteProduct(p.id);
+                      }}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

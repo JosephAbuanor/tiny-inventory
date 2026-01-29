@@ -17,7 +17,7 @@ async function main() {
   });
 
   const stores = [store1, store2, store3];
-  const categories = ["Electronics", "Produce", "Dairy", "Beverages", "Snacks"];
+  const categories = ["electronics", "produce", "dairy", "beverages", "snacks"];
   const names = [
     "Organic Milk",
     "Wireless Mouse",

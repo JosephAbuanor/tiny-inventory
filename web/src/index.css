@@ -57,6 +57,29 @@ h1 {
   background: #f0f0f0;
 }
 
+.store-summaries {
+  margin: 1rem 0;
+}
+.store-summaries h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+.summary-table {
+  width: 100%;
+  max-width: 500px;
+  border-collapse: collapse;
+  background: #fff;
+}
+.summary-table th,
+.summary-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.summary-table th {
+  font-weight: 600;
+}
+
 .product-list .toolbar {
   margin: 1rem 0;
 }
@@ -89,10 +112,21 @@ h1 {
 .product-table th {
   font-weight: 600;
 }
+.product-table .actions {
+  display: flex;
+  gap: 0.5rem;
+}
 .product-table button {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
   cursor: pointer;
+}
+.product-table button.delete {
+  color: #c00;
+  border-color: #c00;
+}
+.product-table button.delete:hover {
+  background: #fee;
 }
 .pagination {
   display: flex;

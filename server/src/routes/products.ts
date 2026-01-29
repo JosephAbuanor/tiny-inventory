@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z as zod } from "zod";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../lib/db.js";
 
 export const productsRouter = Router();
@@ -15,10 +16,33 @@ const updateProductSchema = createProductSchema.partial();
 
 const LOW_STOCK_THRESHOLD = 5;
 
+function normalizeCategory(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+productsRouter.get("/categories", async (req, res) => {
+  try {
+    const storeId = req.query.storeId as string | undefined;
+    const where: Prisma.ProductWhereInput = storeId ? { storeId } : {};
+    const rows = await prisma.product.findMany({
+      where,
+      select: { category: true },
+      distinct: ["category"],
+      orderBy: { category: "asc" },
+    });
+    const categories = rows.map((r) => r.category);
+    res.json(categories);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to list categories" });
+  }
+});
+
 productsRouter.get("/", async (req, res) => {
   try {
     const storeId = req.query.storeId as string | undefined;
-    const category = req.query.category as string | undefined;
+    const categoryRaw = req.query.category as string | undefined;
+    const category = categoryRaw ? normalizeCategory(categoryRaw) : undefined;
     const minPrice = req.query.minPrice != null ? Number(req.query.minPrice) : undefined;
     const maxPrice = req.query.maxPrice != null ? Number(req.query.maxPrice) : undefined;
     const lowStock = req.query.lowStock === "true";
@@ -26,9 +50,9 @@ productsRouter.get("/", async (req, res) => {
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10));
     const skip = (page - 1) * limit;
 
-    const where: Parameters<typeof prisma.product.findMany>[0]["where"] = {};
+    const where: Prisma.ProductWhereInput = {};
     if (storeId) where.storeId = storeId;
-    if (category) where.category = category;
+    if (category) where.category = { equals: category };
     if (minPrice != null && !Number.isNaN(minPrice) || maxPrice != null && !Number.isNaN(maxPrice)) {
       where.price = {};
       if (minPrice != null && !Number.isNaN(minPrice)) (where.price as { gte?: number }).gte = minPrice;
@@ -74,8 +98,12 @@ productsRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
   }
   try {
+    const data = {
+      ...parsed.data,
+      category: normalizeCategory(parsed.data.category),
+    };
     const product = await prisma.product.create({
-      data: parsed.data,
+      data,
       include: { store: { select: { id: true, name: true } } },
     });
     res.status(201).json(product);
@@ -91,9 +119,13 @@ productsRouter.put("/:id", async (req, res) => {
     return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
   }
   try {
+    const data =
+      typeof parsed.data.category === "string"
+        ? { ...parsed.data, category: normalizeCategory(parsed.data.category) }
+        : parsed.data;
     const product = await prisma.product.update({
       where: { id: req.params.id },
-      data: parsed.data,
+      data,
       include: { store: { select: { id: true, name: true } } },
     });
     res.json(product);

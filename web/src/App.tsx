@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchCategories, fetchProducts, fetchStores } from "./api";
-import type { Product, Store } from "./types";
+import { deleteProduct, fetchCategories, fetchProducts, fetchStores, fetchStoreSummaries } from "./api";
+import type { Product, Store, StoreSummary } from "./types";
 import ProductForm from "./ProductForm";
 import ProductList from "./ProductList";
 import StoreList from "./StoreList";
+import StoreSummaries from "./StoreSummaries";
 
 type View = "stores" | "products" | "product-form";
 
@@ -12,6 +13,9 @@ export default function App() {
   const [stores, setStores] = useState<Store[]>([]);
   const [storesLoading, setStoresLoading] = useState(true);
   const [storesError, setStoresError] = useState<string | null>(null);
+  const [summaries, setSummaries] = useState<StoreSummary[]>([]);
+  const [summariesLoading, setSummariesLoading] = useState(false);
+  const [summariesError, setSummariesError] = useState<string | null>(null);
 
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -43,6 +47,23 @@ export default function App() {
   useEffect(() => {
     loadStores();
   }, [loadStores]);
+
+  const loadSummaries = useCallback(async () => {
+    setSummariesLoading(true);
+    setSummariesError(null);
+    try {
+      const data = await fetchStoreSummaries();
+      setSummaries(data);
+    } catch (e) {
+      setSummariesError(e instanceof Error ? e.message : "Failed to load summaries");
+    } finally {
+      setSummariesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (view === "stores") loadSummaries();
+  }, [view, loadSummaries]);
 
   const loadCategories = useCallback(async (storeId: string) => {
     try {
@@ -112,6 +133,16 @@ export default function App() {
     loadProducts();
   };
 
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      await deleteProduct(id);
+      if (selectedStoreId) loadCategories(selectedStoreId);
+      loadProducts();
+    } catch (e) {
+      setProductsError(e instanceof Error ? e.message : "Failed to delete product");
+    }
+  };
+
   const selectedStoreName = selectedStoreId
     ? stores.find((s) => s.id === selectedStoreId)?.name ?? "Store"
     : "";
@@ -123,6 +154,11 @@ export default function App() {
       {view === "stores" && (
         <>
           <p>Select a store to view and manage products.</p>
+          <StoreSummaries
+            summaries={summaries}
+            loading={summariesLoading}
+            error={summariesError}
+          />
           <StoreList
             stores={stores}
             loading={storesLoading}
@@ -155,6 +191,7 @@ export default function App() {
           onPageChange={setProductsPage}
           onBack={handleBackToStores}
           onSelectProduct={handleSelectProduct}
+          onDeleteProduct={handleDeleteProduct}
           onAddProduct={handleAddProduct}
         />
       )}
