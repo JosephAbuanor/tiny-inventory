@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { z } from "zod";
+import { z as zod } from "zod";
 import { prisma } from "../lib/db.js";
 
 export const storesRouter = Router();
 
-const createStoreSchema = z.object({ name: z.string().min(1, "Name is required") });
+const createStoreSchema = zod.object({ name: zod.string().min(1, "Name is required") });
 const updateStoreSchema = createStoreSchema.partial();
 
 storesRouter.get("/", async (_req, res) => {
