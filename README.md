@@ -45,14 +45,26 @@ List products returns `{ data, total, page, limit }`. Errors use `{ error: { mes
 
 ## Testing Approach
 
-- **API:** Integration tests for stores and products CRUD, and for `GET /api/stores/summaries` (aggregation and shape). Use Jest + supertest against an in-memory or test SQLite DB.
-- **Frontend:** Key flows (store list → product list → edit product) with React Testing Library; mock API or use a test server.
-- **Rationale:** Prioritize “does the API and UI behave as specified” over unit-testing every helper. With more time: E2E (Playwright) for main flows and load test for pagination.
+**Backend**
+- Focus on integration-style API tests using Jest and supertest, exercising the app through HTTP rather than unit-testing individual helpers.
+- Add targeted tests for the non-trivial aggregation endpoint `GET /api/stores/summaries` to verify computed values such as total inventory value and low-stock counts.
+- Run tests against a separate SQLite database to keep tests fast and deterministic.
+
+**Frontend**
+- UI behavior was manually tested by walking through the main flows:
+    - store list -> product list
+    - filtering by category and low-stock
+    - pagination
+    - creating, editing, and deleting products
+
+- Loading, error, and empty states were verified visually to ensure predictable user feedback.
+
+**Rationale**
+- Prioritize tests that validate observable behavior and contracts over exhaustive unit tests, given the size of the application and time period.
+
 
 ## If I had more time
 
-1. **E2E tests** — Playwright for “select store → filter products → edit product” and “create product” to guard regressions.
-2. **Product search by name** — Query param and index (or full-text) for the products list endpoint.
-3. **Export inventory to CSV** — Download store/product data for reporting.
-4. **Better component display and layout** — Refine spacing, alignment, and responsive behavior across screens.
-5. **More design and colors** — Stronger visual hierarchy, palette, and polish for better UI/UX.
+1. **E2E/Unit tests** - Playwright for "select store -> filter products -> edit product" and "create product" to guard regressions. Unit testing necessary functions.
+2. **Export inventory to CSV** - Download store/product data for reporting.
+3. **Better display and layout** - Refine spacing, alignment, and responsive behavior across screens. Stronger visual hierarchy, palette, and polish for better UI/UX.
