@@ -10,32 +10,41 @@ interface Props {
 }
 
 export default function StoreList({ stores, loading, error, onSelectStore, onDeleteStore, onRetry }: Props) {
-  if (loading) return <p className="text-slate-600 py-4">Loading stores…</p>;
+  if (loading) {
+    return (
+      <p className="text-slate-500 py-6 text-sm animate-pulse">Loading stores…</p>
+    );
+  }
   if (error)
     return (
-      <div className="flex flex-wrap items-center gap-3 my-4">
-        <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">Error: {error}</p>
+      <div className="flex flex-wrap items-center gap-3 my-4 p-4 card rounded-xl">
+        <p className="text-red-700 bg-red-50/90 px-3 py-2 rounded-lg text-sm border border-red-100">
+          Error: {error}
+        </p>
         {onRetry && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
-          >
+          <button type="button" onClick={onRetry} className="btn-secondary text-sm py-1.5 px-3">
             Reload
           </button>
         )}
       </div>
     );
-  if (stores.length === 0) return <p className="text-slate-600 py-4">No stores.</p>;
+  if (stores.length === 0) {
+    return (
+      <p className="text-slate-500 py-8 text-center text-sm">No stores yet. Add one above.</p>
+    );
+  }
 
   return (
-    <ul className="list-none p-0 m-0 space-y-2">
+    <ul className="list-none p-0 m-0 space-y-3">
       {stores.map((s) => (
-        <li key={s.id} className="flex items-center gap-2 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition">
+        <li
+          key={s.id}
+          className="flex items-center gap-2 card rounded-xl border-l-4 border-l-indigo-500 card-hover"
+        >
           <button
             type="button"
             onClick={() => onSelectStore(s.id)}
-            className="flex-1 text-left py-3 px-4 font-medium text-slate-800"
+            className="flex-1 text-left py-3.5 px-5 font-medium text-slate-800 hover:text-indigo-700 transition-colors"
           >
             {s.name}
           </button>
@@ -47,7 +56,7 @@ export default function StoreList({ stores, loading, error, onSelectStore, onDel
             }}
             title="Delete store"
             aria-label={`Delete ${s.name}`}
-            className="text-red-600 border border-red-300 rounded-md px-3 py-1.5 text-sm hover:bg-red-50 mx-2 mb-2 mt-2"
+            className="btn-danger mr-3 my-2"
           >
             Delete
           </button>

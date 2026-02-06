@@ -102,19 +102,18 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
     }
   };
 
-  const inputClass =
-    "block w-full border border-slate-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none";
-
-  if (loading) return <p className="text-slate-600 py-4">Loading product…</p>;
+  if (loading) {
+    return (
+      <p className="text-slate-500 py-6 text-sm animate-pulse">Loading product…</p>
+    );
+  }
   if (error && mode === "edit")
     return (
-      <div className="flex flex-wrap items-center gap-3 my-4">
-        <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">Error: {error}</p>
-        <button
-          type="button"
-          onClick={loadProduct}
-          className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
-        >
+      <div className="flex flex-wrap items-center gap-3 my-4 p-4 card rounded-xl">
+        <p className="text-red-700 bg-red-50/90 px-3 py-2 rounded-lg text-sm border border-red-100">
+          Error: {error}
+        </p>
+        <button type="button" onClick={loadProduct} className="btn-secondary text-sm py-1.5 px-3">
           Reload
         </button>
       </div>
@@ -122,41 +121,43 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
 
   return (
     <div className="max-w-md">
-      <h2 className="text-xl font-semibold text-slate-800 mb-4">
-        {mode === "create" ? "Add product" : "Edit product"}
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block font-medium text-slate-700">
-            Name <span className="text-red-500">*</span>
+      <div className="card p-6 sm:p-8 rounded-xl shadow-card-lg">
+        <h2 className="font-display text-2xl font-semibold text-slate-900 tracking-tight mb-6">
+          {mode === "create" ? "Add product" : "Edit product"}
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Name <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              className={inputClass}
+              className="input-premium mt-0"
             />
             {errors.name && (
-              <span className="block text-red-600 text-sm mt-1">{errors.name}</span>
+              <span className="block text-red-600 text-sm mt-1.5">{errors.name}</span>
             )}
-          </label>
-        </div>
-        <div className="mb-4">
-          <label className="block font-medium text-slate-700">
-            Category <span className="text-red-500">*</span>
+          </div>
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Category <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               value={form.category}
               onChange={(e) => handleChange("category", e.target.value)}
-              className={inputClass}
+              className="input-premium mt-0"
             />
             {errors.category && (
-              <span className="block text-red-600 text-sm mt-1">{errors.category}</span>
+              <span className="block text-red-600 text-sm mt-1.5">{errors.category}</span>
             )}
-          </label>
-        </div>
-        <div className="mb-4">
-          <label className="block font-medium text-slate-700">
-            Price <span className="text-red-500">*</span>
+          </div>
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Price <span className="text-red-500">*</span>
+            </label>
             <input
               type="number"
               step="0.01"
@@ -165,16 +166,16 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
               onChange={(e) =>
                 handleChange("price", e.target.value === "" ? 0 : Number(e.target.value))
               }
-              className={inputClass}
+              className="input-premium mt-0"
             />
             {errors.price && (
-              <span className="block text-red-600 text-sm mt-1">{errors.price}</span>
+              <span className="block text-red-600 text-sm mt-1.5">{errors.price}</span>
             )}
-          </label>
-        </div>
-        <div className="mb-4">
-          <label className="block font-medium text-slate-700">
-            Quantity in stock
+          </div>
+          <div className="mb-5">
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              Quantity in stock
+            </label>
             <input
               type="number"
               min="0"
@@ -183,36 +184,38 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
               onChange={(e) =>
                 handleChange("quantityInStock", Number(e.target.value) || 0)
               }
-              className={inputClass}
+              className="input-premium mt-0"
             />
             {errors.quantityInStock && (
-              <span className="block text-red-600 text-sm mt-1">
+              <span className="block text-red-600 text-sm mt-1.5">
                 {errors.quantityInStock}
               </span>
             )}
-          </label>
-        </div>
-        {error && (
-          <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm mb-4">{error}</p>
-        )}
-        <div className="flex gap-3 mt-6">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={submitLoading}
-            className="border border-slate-300 rounded-md px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            disabled={submitLoading}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 font-medium"
-          >
-            {submitLoading ? "Saving…" : mode === "create" ? "Create" : "Save"}
-          </button>
-        </div>
-      </form>
+          </div>
+          {error && (
+            <p className="text-red-700 bg-red-50/90 px-3 py-2 rounded-lg text-sm mb-5 border border-red-100">
+              {error}
+            </p>
+          )}
+          <div className="flex gap-3 mt-8 pt-2">
+            <button
+              type="button"
+              onClick={onBack}
+              disabled={submitLoading}
+              className="btn-secondary disabled:opacity-50 disabled:active:scale-100"
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={submitLoading}
+              className="btn-primary disabled:opacity-50 disabled:active:scale-100"
+            >
+              {submitLoading ? "Saving…" : mode === "create" ? "Create" : "Save"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

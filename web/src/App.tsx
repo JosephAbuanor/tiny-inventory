@@ -196,21 +196,28 @@ export default function App() {
     : "";
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-semibold text-slate-800 mb-1">Tiny Inventory</h1>
+    <div className="min-h-screen max-w-3xl mx-auto px-4 py-8 sm:py-10">
+      <header className="pb-6 mb-6 border-b border-slate-200/80">
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-slate-900">
+          Tiny Inventory
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">Manage stores and products</p>
+      </header>
 
       {view === "stores" && (
         <>
-          <p className="text-slate-600 mb-6">Select a store to view and manage products.</p>
+          <p className="text-slate-600 mb-8 leading-relaxed">
+            Select a store to view and manage products.
+          </p>
           <StoreSummaries
             summaries={summaries}
             loading={summariesLoading}
             error={summariesError}
             onRetry={loadSummaries}
           />
-          <section className="mb-6" aria-label="Add store">
-            <form onSubmit={handleCreateStore} className="flex flex-wrap items-end gap-3">
-              <label htmlFor="new-store-name" className="flex flex-col gap-1 font-medium text-slate-700">
+          <section className="mb-8 card p-5 sm:p-6" aria-label="Add store">
+            <form onSubmit={handleCreateStore} className="flex flex-wrap items-end gap-4">
+              <label htmlFor="new-store-name" className="flex flex-col gap-1.5 text-sm font-medium text-slate-700">
                 New store name
               </label>
               <input
@@ -221,31 +228,27 @@ export default function App() {
                   setNewStoreName(e.target.value);
                   setStoreFormError(null);
                 }}
-                placeholder="Store name"
+                placeholder="e.g. Downtown Warehouse"
                 minLength={1}
                 required
                 aria-invalid={!!storeFormError}
                 aria-describedby={storeFormError ? "store-form-error" : undefined}
-                className="border border-slate-300 rounded-md px-3 py-2 min-w-[200px] focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                className="input-premium min-w-[220px]"
               />
               <button
                 type="submit"
                 disabled={!newStoreName.trim()}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-indigo-600 disabled:active:scale-100"
               >
                 Add store
               </button>
             </form>
             {storeFormError && (
-              <div className="flex flex-wrap items-center gap-3 mt-3" role="alert">
-                <p id="store-form-error" className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">
+              <div className="flex flex-wrap items-center gap-3 mt-4" role="alert">
+                <p id="store-form-error" className="text-red-700 bg-red-50/90 px-3 py-2 rounded-lg text-sm border border-red-100">
                   {storeFormError}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setStoreFormError(null)}
-                  className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
-                >
+                <button type="button" onClick={() => setStoreFormError(null)} className="btn-secondary text-sm py-1.5 px-3">
                   Try again
                 </button>
               </div>

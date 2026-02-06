@@ -43,45 +43,46 @@ export default function ProductList({
 }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
-  if (loading) return <p className="text-slate-600 py-4">Loading products…</p>;
+  if (loading) {
+    return (
+      <p className="text-slate-500 py-6 text-sm animate-pulse">Loading products…</p>
+    );
+  }
   if (error)
     return (
-      <div className="flex flex-wrap items-center gap-3 my-4">
-        <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">Error: {error}</p>
+      <div className="flex flex-wrap items-center gap-3 my-4 p-4 card rounded-xl">
+        <p className="text-red-700 bg-red-50/90 px-3 py-2 rounded-lg text-sm border border-red-100">
+          Error: {error}
+        </p>
         {onRetry && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
-          >
+          <button type="button" onClick={onRetry} className="btn-secondary text-sm py-1.5 px-3">
             Reload
           </button>
         )}
       </div>
     );
 
-  const inputSelectClass =
-    "border border-slate-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none";
-
   return (
     <div>
-      <div className="mb-4">
+      <div className="mb-6">
         <button
           type="button"
           onClick={onBack}
-          className="text-indigo-600 hover:text-indigo-700 font-medium mb-2"
+          className="text-indigo-600 hover:text-indigo-700 font-medium mb-3 text-sm transition-colors"
         >
           ← Back to stores
         </button>
-        <h2 className="text-xl font-semibold text-slate-800 mt-2 mb-3">{storeName}</h2>
-        <div className="flex flex-wrap items-center gap-4 mb-4">
-          <label className="flex items-center gap-2 text-slate-700">
+        <h2 className="font-display text-2xl font-semibold text-slate-900 tracking-tight mb-4">
+          {storeName}
+        </h2>
+        <div className="flex flex-wrap items-center gap-4 mb-4 p-4 card rounded-xl">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
             Category
             <select
               value={categoryFilter}
               onChange={(e) => onCategoryChange(e.target.value)}
               aria-label="Filter by category"
-              className={inputSelectClass}
+              className="input-premium min-w-[140px] py-2"
             >
               <option value="">All</option>
               {categories.map((c) => (
@@ -89,86 +90,99 @@ export default function ProductList({
               ))}
             </select>
           </label>
-          <label className="flex items-center gap-2 text-slate-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
             <input
               type="checkbox"
               checked={lowStockOnly}
               onChange={(e) => onLowStockChange(e.target.checked)}
-              className="rounded text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             />
             Low stock only
           </label>
         </div>
-        <button
-          type="button"
-          onClick={onAddProduct}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-medium"
-        >
+        <button type="button" onClick={onAddProduct} className="btn-primary">
           Add product
         </button>
       </div>
       {products.length === 0 ? (
-        <p className="text-slate-600 py-4">No products.</p>
+        <p className="text-slate-500 py-10 text-center text-sm card rounded-xl">No products yet.</p>
       ) : (
         <>
-          <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-slate-200 my-4">
-            <thead>
-              <tr>
-                <th className="px-4 py-3 text-left bg-slate-50 font-semibold text-slate-700 border-b border-slate-200">Name</th>
-                <th className="px-4 py-3 text-left bg-slate-50 font-semibold text-slate-700 border-b border-slate-200">Category</th>
-                <th className="px-4 py-3 text-left bg-slate-50 font-semibold text-slate-700 border-b border-slate-200">Price</th>
-                <th className="px-4 py-3 text-left bg-slate-50 font-semibold text-slate-700 border-b border-slate-200">Stock</th>
-                <th className="px-4 py-3 text-left bg-slate-50 font-semibold text-slate-700 border-b border-slate-200">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
-                  <td className="px-4 py-3 text-slate-800">{p.name}</td>
-                  <td className="px-4 py-3 text-slate-700">{p.category}</td>
-                  <td className="px-4 py-3 text-slate-700">${p.price.toFixed(2)}</td>
-                  <td className="px-4 py-3 text-slate-700">{p.quantityInStock}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => onSelectProduct(p.id)}
-                        className="border border-slate-300 rounded px-2 py-1 text-sm hover:bg-slate-50"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (window.confirm(`Delete "${p.name}"?`)) onDeleteProduct(p.id);
-                        }}
-                        className="text-red-600 border border-red-300 rounded px-2 py-1 text-sm hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+          <div className="card overflow-hidden rounded-xl my-6">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr>
+                  <th className="px-5 py-3.5 text-left bg-slate-50/90 font-semibold text-slate-700 text-sm border-b border-slate-200">
+                    Name
+                  </th>
+                  <th className="px-5 py-3.5 text-left bg-slate-50/90 font-semibold text-slate-700 text-sm border-b border-slate-200">
+                    Category
+                  </th>
+                  <th className="px-5 py-3.5 text-left bg-slate-50/90 font-semibold text-slate-700 text-sm border-b border-slate-200">
+                    Price
+                  </th>
+                  <th className="px-5 py-3.5 text-left bg-slate-50/90 font-semibold text-slate-700 text-sm border-b border-slate-200">
+                    Stock
+                  </th>
+                  <th className="px-5 py-3.5 text-left bg-slate-50/90 font-semibold text-slate-700 text-sm border-b border-slate-200">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex items-center gap-4 my-4">
+              </thead>
+              <tbody>
+                {products.map((p, i) => (
+                  <tr
+                    key={p.id}
+                    className={`border-b border-slate-100 last:border-0 hover:bg-slate-50/60 transition-colors ${
+                      i % 2 === 1 ? "bg-slate-50/30" : "bg-white"
+                    }`}
+                  >
+                    <td className="px-5 py-3.5 font-medium text-slate-800">{p.name}</td>
+                    <td className="px-5 py-3.5 text-slate-600">{p.category}</td>
+                    <td className="px-5 py-3.5 text-slate-600 tabular-nums">${p.price.toFixed(2)}</td>
+                    <td className="px-5 py-3.5 text-slate-600">{p.quantityInStock}</td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => onSelectProduct(p.id)}
+                          className="btn-secondary text-sm py-1.5 px-2.5"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm(`Delete "${p.name}"?`)) onDeleteProduct(p.id);
+                          }}
+                          className="btn-danger"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-wrap items-center gap-4 my-6 p-3 rounded-xl bg-white/60 border border-slate-200/80">
             <button
               type="button"
               disabled={page <= 1}
               onClick={() => onPageChange(page - 1)}
-              className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary text-sm py-1.5 px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
             >
               Previous
             </button>
             <span className="text-slate-600 text-sm">
-              Page {page} of {totalPages} ({total} total)
+              Page {page} of {totalPages} <span className="text-slate-400">({total} total)</span>
             </span>
             <button
               type="button"
               disabled={page >= totalPages}
               onClick={() => onPageChange(page + 1)}
-              className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-secondary text-sm py-1.5 px-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
             >
               Next
             </button>
@@ -176,7 +190,7 @@ export default function ProductList({
           <button
             type="button"
             onClick={onBack}
-            className="text-indigo-600 hover:text-indigo-700 font-medium"
+            className="text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors"
           >
             ← Back to stores
           </button>
