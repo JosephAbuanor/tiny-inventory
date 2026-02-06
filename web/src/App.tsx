@@ -196,21 +196,23 @@ export default function App() {
     : "";
 
   return (
-    <div className="app">
-      <h1>Tiny Inventory</h1>
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <h1 className="text-2xl font-semibold text-slate-800 mb-1">Tiny Inventory</h1>
 
       {view === "stores" && (
         <>
-          <p>Select a store to view and manage products.</p>
+          <p className="text-slate-600 mb-6">Select a store to view and manage products.</p>
           <StoreSummaries
             summaries={summaries}
             loading={summariesLoading}
             error={summariesError}
             onRetry={loadSummaries}
           />
-          <section className="store-create" aria-label="Add store">
-            <form onSubmit={handleCreateStore}>
-              <label htmlFor="new-store-name">New store name</label>
+          <section className="mb-6" aria-label="Add store">
+            <form onSubmit={handleCreateStore} className="flex flex-wrap items-end gap-3">
+              <label htmlFor="new-store-name" className="flex flex-col gap-1 font-medium text-slate-700">
+                New store name
+              </label>
               <input
                 id="new-store-name"
                 type="text"
@@ -224,17 +226,26 @@ export default function App() {
                 required
                 aria-invalid={!!storeFormError}
                 aria-describedby={storeFormError ? "store-form-error" : undefined}
+                className="border border-slate-300 rounded-md px-3 py-2 min-w-[200px] focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
               />
-              <button type="submit" disabled={!newStoreName.trim()}>
+              <button
+                type="submit"
+                disabled={!newStoreName.trim()}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              >
                 Add store
               </button>
             </form>
             {storeFormError && (
-              <div className="error-block" role="alert">
-                <p id="store-form-error" className="error">
+              <div className="flex flex-wrap items-center gap-3 mt-3" role="alert">
+                <p id="store-form-error" className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">
                   {storeFormError}
                 </p>
-                <button type="button" onClick={() => setStoreFormError(null)}>
+                <button
+                  type="button"
+                  onClick={() => setStoreFormError(null)}
+                  className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
+                >
                   Try again
                 </button>
               </div>

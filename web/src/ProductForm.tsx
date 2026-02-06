@@ -102,77 +102,113 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
     }
   };
 
-  if (loading) return <p className="loading">Loading product…</p>;
+  const inputClass =
+    "block w-full border border-slate-300 rounded-md px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none";
+
+  if (loading) return <p className="text-slate-600 py-4">Loading product…</p>;
   if (error && mode === "edit")
     return (
-      <div className="error-block">
-        <p className="error">Error: {error}</p>
-        <button type="button" onClick={loadProduct}>
+      <div className="flex flex-wrap items-center gap-3 my-4">
+        <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm">Error: {error}</p>
+        <button
+          type="button"
+          onClick={loadProduct}
+          className="border border-slate-300 rounded-md px-3 py-1.5 text-sm hover:bg-slate-50"
+        >
           Reload
         </button>
       </div>
     );
 
   return (
-    <div className="product-form">
-      <h2>{mode === "create" ? "Add product" : "Edit product"}</h2>
+    <div className="max-w-md">
+      <h2 className="text-xl font-semibold text-slate-800 mb-4">
+        {mode === "create" ? "Add product" : "Edit product"}
+      </h2>
       <form onSubmit={handleSubmit}>
-        <div className="form-row">
-          <label>
-            Name <span className="required">*</span>
+        <div className="mb-4">
+          <label className="block font-medium text-slate-700">
+            Name <span className="text-red-500">*</span>
             <input
               type="text"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
+              className={inputClass}
             />
-            {errors.name && <span className="field-error">{errors.name}</span>}
+            {errors.name && (
+              <span className="block text-red-600 text-sm mt-1">{errors.name}</span>
+            )}
           </label>
         </div>
-        <div className="form-row">
-          <label>
-            Category <span className="required">*</span>
+        <div className="mb-4">
+          <label className="block font-medium text-slate-700">
+            Category <span className="text-red-500">*</span>
             <input
               type="text"
               value={form.category}
               onChange={(e) => handleChange("category", e.target.value)}
+              className={inputClass}
             />
-            {errors.category && <span className="field-error">{errors.category}</span>}
+            {errors.category && (
+              <span className="block text-red-600 text-sm mt-1">{errors.category}</span>
+            )}
           </label>
         </div>
-        <div className="form-row">
-          <label>
-            Price <span className="required">*</span>
+        <div className="mb-4">
+          <label className="block font-medium text-slate-700">
+            Price <span className="text-red-500">*</span>
             <input
               type="number"
               step="0.01"
               min="0"
               value={form.price || ""}
-              onChange={(e) => handleChange("price", e.target.value === "" ? 0 : Number(e.target.value))}
+              onChange={(e) =>
+                handleChange("price", e.target.value === "" ? 0 : Number(e.target.value))
+              }
+              className={inputClass}
             />
-            {errors.price && <span className="field-error">{errors.price}</span>}
+            {errors.price && (
+              <span className="block text-red-600 text-sm mt-1">{errors.price}</span>
+            )}
           </label>
         </div>
-        <div className="form-row">
-          <label>
+        <div className="mb-4">
+          <label className="block font-medium text-slate-700">
             Quantity in stock
             <input
               type="number"
               min="0"
               step="1"
               value={form.quantityInStock}
-              onChange={(e) => handleChange("quantityInStock", Number(e.target.value) || 0)}
+              onChange={(e) =>
+                handleChange("quantityInStock", Number(e.target.value) || 0)
+              }
+              className={inputClass}
             />
             {errors.quantityInStock && (
-              <span className="field-error">{errors.quantityInStock}</span>
+              <span className="block text-red-600 text-sm mt-1">
+                {errors.quantityInStock}
+              </span>
             )}
           </label>
         </div>
-        {error && <p className="error">{error}</p>}
-        <div className="form-actions">
-          <button type="button" onClick={onBack} disabled={submitLoading}>
+        {error && (
+          <p className="text-red-700 bg-red-50 px-3 py-2 rounded-md text-sm mb-4">{error}</p>
+        )}
+        <div className="flex gap-3 mt-6">
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={submitLoading}
+            className="border border-slate-300 rounded-md px-4 py-2 hover:bg-slate-50 disabled:opacity-50"
+          >
             Back
           </button>
-          <button type="submit" disabled={submitLoading}>
+          <button
+            type="submit"
+            disabled={submitLoading}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 disabled:opacity-50 font-medium"
+          >
             {submitLoading ? "Saving…" : mode === "create" ? "Create" : "Save"}
           </button>
         </div>
