@@ -43,13 +43,14 @@ List products returns `{ data, total, page, limit }`. Errors use `{ error: { mes
 - **Categories as string:** I intentionally modeled categories as a simple string field rather than a separate table to keep the domain lightweight and avoid premature complexity. To support the UI, I exposed a derived endpoint that returns distinct category values from existing products. In a larger system with category ownership, permissions, or metadata, this would naturally evolve into a first-class Category model. Categories are also normalized (trimmed and lowercased) on write to avoid duplication.
 - **Seeding:** Database seeding runs on container startup to ensure reviewers have data immediately. In a real production setup, seeding would be gated or removed after initial provisioning.
 - TypeScript is used primarily to define API contracts and constrain data flow at compile time, while Zod handles runtime validation at the system boundary. This avoids duplication while still providing strong guarantees.
+- I intentionally kept routing, validation, and domain logic in one location for this assignment to reduce indirection and keep the flow easy to follow. Given the small scope and limited domain complexity, this avoids premature abstraction. In a larger system, I would extract business logic into service modules and keep routes thin.
 
 ## Testing Approach
 
 **Backend**
-- Focus on integration-style API tests using Jest and supertest, exercising the app through HTTP rather than unit-testing individual helpers.
-- Add targeted tests for the non-trivial aggregation endpoint `GET /api/stores/summaries` to verify computed values such as total inventory value and low-stock counts.
-- Run tests against a separate SQLite database to keep tests fast and deterministic.
+- Error handling paths (validation errors, not-found cases, and server errors) were manually exercised to confirm correct status codes and response shapes.
+- Key backend logic such as filtering, pagination, category derivation, and aggregated store summaries was verified using real seed data.
+- Primary confidence comes from manual verification of API behavior during development, exercised through the frontend and direct HTTP requests.
 
 **Frontend**
 - UI behavior was manually tested by walking through the main flows:
