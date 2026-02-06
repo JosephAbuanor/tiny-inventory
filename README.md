@@ -42,6 +42,7 @@ List products returns `{ data, total, page, limit }`. Errors use `{ error: { mes
 - **Frontend:** Minimal routing (state-based), no global state library; validation mirrors server. Focus on list/detail flow and loading/error/empty states.
 - **Categories as string:** I intentionally modeled categories as a simple string field rather than a separate table to keep the domain lightweight and avoid premature complexity. To support the UI, I exposed a derived endpoint that returns distinct category values from existing products. In a larger system with category ownership, permissions, or metadata, this would naturally evolve into a first-class Category model. Categories are also normalized (trimmed and lowercased) on write to avoid duplication.
 - **Seeding:** Database seeding runs on container startup to ensure reviewers have data immediately. In a real production setup, seeding would be gated or removed after initial provisioning.
+- TypeScript is used primarily to define API contracts and constrain data flow at compile time, while Zod handles runtime validation at the system boundary. This avoids duplication while still providing strong guarantees.
 
 ## Testing Approach
 

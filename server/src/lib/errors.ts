@@ -1,4 +1,5 @@
 import type { Response } from "express";
+import type { ErrorResponse } from "../types/api.js";
 
 export function sendError(
   res: Response,
@@ -6,7 +7,18 @@ export function sendError(
   message: string,
   details?: unknown
 ): void {
-  res.status(status).json({
+  const body: ErrorResponse = {
     error: details !== undefined ? { message, details } : { message },
-  });
+  };
+  res.status(status).json(body);
+}
+
+/** Type guard for "record not found" (P2025). */
+export function NotFoundError(e: unknown): e is { code: string } {
+  return (
+    e != null &&
+    typeof e === "object" &&
+    "code" in e &&
+    (e as { code: string }).code === "P2025"
+  );
 }

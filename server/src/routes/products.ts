@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { z as zod } from "zod";
 import { prisma } from "../lib/db.js";
-import { sendError } from "../lib/errors.js";
+import { NotFoundError, sendError } from "../lib/errors.js";
+import type { CategoriesQuery, IdParams, PaginatedResponse, ProductListQuery } from "../types/api.js";
 
 /**
  * Narrow query shape for product list filtering.
@@ -35,7 +36,8 @@ function normalizeCategory(value: string): string {
 
 productsRouter.get("/categories", async (req, res) => {
   try {
-    const storeId = req.query.storeId as string | undefined;
+    const query = req.query as CategoriesQuery;
+    const storeId = query.storeId;
     const where: ProductWhereInput = storeId ? { storeId } : {};
     const rows = await prisma.product.findMany({
       where,
@@ -43,7 +45,7 @@ productsRouter.get("/categories", async (req, res) => {
       distinct: ["category"],
       orderBy: { category: "asc" },
     });
-    const categories = rows.map((r: { category: string }) => r.category);
+    const categories: string[] = rows.map((r) => r.category);
     res.json(categories);
   } catch (e) {
     console.error(e);
@@ -53,14 +55,15 @@ productsRouter.get("/categories", async (req, res) => {
 
 productsRouter.get("/", async (req, res) => {
   try {
-    const storeId = req.query.storeId as string | undefined;
-    const categoryRaw = req.query.category as string | undefined;
+    const query = req.query as ProductListQuery;
+    const storeId = query.storeId;
+    const categoryRaw = query.category;
     const category = categoryRaw ? normalizeCategory(categoryRaw) : undefined;
-    const minPrice = req.query.minPrice != null ? Number(req.query.minPrice) : undefined;
-    const maxPrice = req.query.maxPrice != null ? Number(req.query.maxPrice) : undefined;
-    const lowStock = req.query.lowStock === "true";
-    const page = Math.max(1, Number(req.query.page) || 1);
-    const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10));
+    const minPrice = query.minPrice != null ? Number(query.minPrice) : undefined;
+    const maxPrice = query.maxPrice != null ? Number(query.maxPrice) : undefined;
+    const lowStock = query.lowStock === "true";
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
     const skip = (page - 1) * limit;
 
     const where: ProductWhereInput = {};
@@ -84,7 +87,8 @@ productsRouter.get("/", async (req, res) => {
       prisma.product.count({ where }),
     ]);
 
-    res.json({ data, total, page, limit });
+    const body: PaginatedResponse<typeof data[0]> = { data, total, page, limit };
+    res.json(body);
   } catch (e) {
     console.error(e);
     sendError(res, 500, "Failed to list products");
@@ -93,8 +97,9 @@ productsRouter.get("/", async (req, res) => {
 
 productsRouter.get("/:id", async (req, res) => {
   try {
+    const { id } = req.params as IdParams;
     const product = await prisma.product.findUnique({
-      where: { id: req.params.id },
+      where: { id },
       include: { store: true },
     });
     if (!product) return sendError(res, 404, "Product not found");
@@ -132,20 +137,19 @@ productsRouter.put("/:id", async (req, res) => {
     return sendError(res, 400, "Validation failed", parsed.error.flatten().fieldErrors);
   }
   try {
+    const { id } = req.params as IdParams;
     const data =
       typeof parsed.data.category === "string"
         ? { ...parsed.data, category: normalizeCategory(parsed.data.category) }
         : parsed.data;
     const product = await prisma.product.update({
-      where: { id: req.params.id },
+      where: { id },
       data,
       include: { store: { select: { id: true, name: true } } },
     });
     res.json(product);
   } catch (e: unknown) {
-    if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return sendError(res, 404, "Product not found");
-    }
+    if (NotFoundError(e)) return sendError(res, 404, "Product not found");
     console.error(e);
     sendError(res, 500, "Failed to update product");
   }
@@ -153,12 +157,11 @@ productsRouter.put("/:id", async (req, res) => {
 
 productsRouter.delete("/:id", async (req, res) => {
   try {
-    await prisma.product.delete({ where: { id: req.params.id } });
+    const { id } = req.params as IdParams;
+    await prisma.product.delete({ where: { id } });
     res.status(204).send();
   } catch (e: unknown) {
-    if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return sendError(res, 404, "Product not found");
-    }
+    if (NotFoundError(e)) return sendError(res, 404, "Product not found");
     console.error(e);
     sendError(res, 500, "Failed to delete product");
   }

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { z as zod } from "zod";
 import { prisma } from "../lib/db.js";
-import { sendError } from "../lib/errors.js";
+import { NotFoundError, sendError } from "../lib/errors.js";
+import type { IdParams, StoreSummary, StoreSummaryRow } from "../types/api.js";
 
 export const storesRouter = Router();
 
@@ -22,9 +23,7 @@ storesRouter.get("/", async (_req, res) => {
 /** Non-trivial: inventory summary by store (aggregation in DB). */
 storesRouter.get("/summaries", async (_req, res) => {
   try {
-    const rows = await prisma.$queryRaw<
-      { storeId: string; storeName: string; productCount: bigint; totalValue: number; lowStockCount: bigint }[]
-    >`
+    const rows = await prisma.$queryRaw<StoreSummaryRow[]>`
       SELECT s.id AS storeId, s.name AS storeName,
         COUNT(p.id) AS productCount,
         CAST(COALESCE(SUM(p.price * p.quantityInStock), 0) AS REAL) AS totalValue,
@@ -34,7 +33,7 @@ storesRouter.get("/summaries", async (_req, res) => {
       GROUP BY s.id, s.name
       ORDER BY s.name
     `;
-    const summaries = rows.map((r: { storeId: string; storeName: string; productCount: bigint; totalValue: number; lowStockCount: bigint }) => ({
+    const summaries: StoreSummary[] = rows.map((r) => ({
       storeId: r.storeId,
       storeName: r.storeName,
       productCount: Number(r.productCount),
@@ -64,12 +63,11 @@ storesRouter.post("/", async (req, res) => {
 
 storesRouter.delete("/:id", async (req, res) => {
   try {
-    await prisma.store.delete({ where: { id: req.params.id } });
+    const { id } = req.params as IdParams;
+    await prisma.store.delete({ where: { id } });
     res.status(204).send();
   } catch (e: unknown) {
-    if (e && typeof e === "object" && "code" in e && e.code === "P2025") {
-      return sendError(res, 404, "Store not found");
-    }
+    if (NotFoundError(e)) return sendError(res, 404, "Store not found");
     console.error(e);
     sendError(res, 500, "Failed to delete store");
   }
