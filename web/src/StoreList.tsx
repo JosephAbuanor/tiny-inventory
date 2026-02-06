@@ -6,11 +6,22 @@ interface Props {
   error: string | null;
   onSelectStore: (storeId: string) => void;
   onDeleteStore: (storeId: string, storeName: string) => void;
+  onRetry?: () => void;
 }
 
-export default function StoreList({ stores, loading, error, onSelectStore, onDeleteStore }: Props) {
+export default function StoreList({ stores, loading, error, onSelectStore, onDeleteStore, onRetry }: Props) {
   if (loading) return <p className="loading">Loading stores…</p>;
-  if (error) return <p className="error">Error: {error}</p>;
+  if (error)
+    return (
+      <div className="error-block">
+        <p className="error">Error: {error}</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry}>
+            Reload
+          </button>
+        )}
+      </div>
+    );
   if (stores.length === 0) return <p className="empty">No stores.</p>;
 
   return (

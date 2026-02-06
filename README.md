@@ -37,7 +37,7 @@ List products returns `{ data, total, page, limit }`. Errors use `{ error: { mes
 - **Monorepo (server + web):** Clear boundary; shared tooling and one clone. Chose pnpm workspaces.
 - **Prisma + SQLite:** Real relations and migrations without an external DB. Postgres could be used for production scale.
 - **Single Docker container:** Server serves the built React app and the API so `docker compose up` is one service, one port. Trade-off: no separate scaling of front/back- acceptable for this scope.
-- **No auth:** Per assignment; would add API keys or JWT and rate limiting for production.
+- **No auth:** Per assignment; would add API keys or JWT for production.
 - **Zod on server:** Request validation and clear error shapes without a heavy framework.
 - **Frontend:** Minimal routing (state-based), no global state library; validation mirrors server. Focus on list/detail flow and loading/error/empty states.
 - **Categories as string:** I intentionally modeled categories as a simple string field rather than a separate table to keep the domain lightweight and avoid premature complexity. To support the UI, I exposed a derived endpoint that returns distinct category values from existing products. In a larger system with category ownership, permissions, or metadata, this would naturally evolve into a first-class Category model. Categories are also normalized (trimmed and lowercased) on write to avoid duplication.

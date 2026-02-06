@@ -4,11 +4,22 @@ interface Props {
   summaries: StoreSummary[];
   loading: boolean;
   error: string | null;
+  onRetry?: () => void;
 }
 
-export default function StoreSummaries({ summaries, loading, error }: Props) {
+export default function StoreSummaries({ summaries, loading, error, onRetry }: Props) {
   if (loading) return <p className="loading">Loading inventory summary…</p>;
-  if (error) return <p className="error">Error: {error}</p>;
+  if (error)
+    return (
+      <div className="error-block">
+        <p className="error">Error: {error}</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry}>
+            Reload
+          </button>
+        )}
+      </div>
+    );
   if (summaries.length === 0) return null;
 
   return (

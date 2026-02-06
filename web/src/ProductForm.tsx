@@ -103,7 +103,15 @@ export default function ProductForm({ storeId, productId, mode, onDone, onBack }
   };
 
   if (loading) return <p className="loading">Loading product…</p>;
-  if (error && mode === "edit") return <p className="error">Error: {error}</p>;
+  if (error && mode === "edit")
+    return (
+      <div className="error-block">
+        <p className="error">Error: {error}</p>
+        <button type="button" onClick={loadProduct}>
+          Reload
+        </button>
+      </div>
+    );
 
   return (
     <div className="product-form">

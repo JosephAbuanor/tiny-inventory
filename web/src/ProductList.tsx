@@ -18,6 +18,7 @@ interface Props {
   onSelectProduct: (id: string) => void;
   onDeleteProduct: (id: string) => void;
   onAddProduct: () => void;
+  onRetry?: () => void;
 }
 
 export default function ProductList({
@@ -38,11 +39,22 @@ export default function ProductList({
   onSelectProduct,
   onDeleteProduct,
   onAddProduct,
+  onRetry,
 }: Props) {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   if (loading) return <p className="loading">Loading products…</p>;
-  if (error) return <p className="error">Error: {error}</p>;
+  if (error)
+    return (
+      <div className="error-block">
+        <p className="error">Error: {error}</p>
+        {onRetry && (
+          <button type="button" onClick={onRetry}>
+            Reload
+          </button>
+        )}
+      </div>
+    );
 
   return (
     <div className="product-list">

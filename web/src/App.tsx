@@ -206,6 +206,7 @@ export default function App() {
             summaries={summaries}
             loading={summariesLoading}
             error={summariesError}
+            onRetry={loadSummaries}
           />
           <section className="store-create" aria-label="Add store">
             <form onSubmit={handleCreateStore}>
@@ -229,9 +230,14 @@ export default function App() {
               </button>
             </form>
             {storeFormError && (
-              <p id="store-form-error" className="error" role="alert">
-                {storeFormError}
-              </p>
+              <div className="error-block" role="alert">
+                <p id="store-form-error" className="error">
+                  {storeFormError}
+                </p>
+                <button type="button" onClick={() => setStoreFormError(null)}>
+                  Try again
+                </button>
+              </div>
             )}
           </section>
           <StoreList
@@ -240,6 +246,7 @@ export default function App() {
             error={storesError}
             onSelectStore={handleSelectStore}
             onDeleteStore={handleDeleteStore}
+            onRetry={loadStores}
           />
         </>
       )}
